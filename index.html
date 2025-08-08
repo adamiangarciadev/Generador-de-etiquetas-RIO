@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Selector de Artículos y Códigos de Barra</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    select, button { width: 100%; padding: 10px; margin: 10px 0; }
+    ul { list-style-type: none; padding-left: 0; }
+    li { background: #eee; padding: 5px 10px; margin: 5px 0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Generador de TXT desde equivalencias.csv</h1>
+
+  <label for="articulo">Artículo:</label>
+  <select id="articulo"><option value="">Cargando...</option></select>
+
+  <label for="color">Color:</label>
+  <select id="color" disabled><option value="">Seleccionar artículo</option></select>
+
+  <label for="talle">Talle:</label>
+  <select id="talle" disabled><option value="">Seleccionar color</option></select>
+
+  <button id="agregar">Agregar a la lista</button>
+
+  <h3>Códigos agregados:</h3>
+  <ul id="lista"></ul>
+
+  <button id="descargar">Descargar TXT</button>
+
+  <script>
+    let registros = [];
+    let lista = [];
+
+    fetch('equivalencias.csv')
+      .then(response => response.text())
+      .then(text => {
+        const lines = text.split('\n');
+        registros = lines.slice(1).map(line => {
+          const cols = line.split(';').map(c => c.replace(/"/g, '').trim());
+          return {
+            codigo: cols[0],
+            articulo: cols[1],
+            color: cols[2],
+            talle: cols[3]
+          };
+        }).filter(r => r.codigo && r.articulo && r.color && r.talle);
+
+        const articulos = [...new Set(registros.map(r => r.articulo))];
+        const artSelect = document.getElementById('articulo');
+        artSelect.innerHTML = '<option value="">Seleccionar...</option>';
+        articulos.forEach(art => {
+          const opt = document.createElement('option');
+          opt.value = art;
+          opt.textContent = art;
+          artSelect.appendChild(opt);
+        });
+      });
+
+    document.getElementById('articulo').addEventListener('change', function() {
+      const art = this.value;
+      const colores = [...new Set(registros.filter(r => r.articulo === art).map(r => r.color))];
+      const colorSelect = document.getElementById('color');
+      colorSelect.innerHTML = '<option value="">Seleccionar...</option>';
+      colores.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        colorSelect.appendChild(opt);
+      });
+      colorSelect.disabled = false;
+
+      const talleSelect = document.getElementById('talle');
+      talleSelect.innerHTML = '<option value="">Seleccionar color</option>';
+      talleSelect.disabled = true;
+    });
+
+    document.getElementById('color').addEventListener('change', function() {
+      const art = document.getElementById('articulo').value;
+      const color = this.value;
+      const talles = [...new Set(registros.filter(r => r.articulo === art && r.color === color).map(r => r.talle))];
+      const talleSelect = document.getElementById('talle');
+      talleSelect.innerHTML = '<option value="">Seleccionar...</option>';
+      talles.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        talleSelect.appendChild(opt);
+      });
+      talleSelect.disabled = false;
+    });
+
+    document.getElementById('agregar').addEventListener('click', function() {
+      const art = document.getElementById('articulo').value;
+      const color = document.getElementById('color').value;
+      const talle = document.getElementById('talle').value;
+      const resultado = registros.find(r => r.articulo === art && r.color === color && r.talle === talle);
+      if (resultado) {
+        lista.push(resultado.codigo);
+        const li = document.createElement('li');
+        li.textContent = resultado.codigo;
+        document.getElementById('lista').appendChild(li);
+      } else {
+        alert('No se encontró el código para esa combinación');
+      }
+    });
+
+    document.getElementById('descargar').addEventListener('click', function() {
+      if (lista.length === 0) return alert('No hay códigos agregados');
+      const contenido = lista.join('\n');
+      const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ETIQUETAS NAZCA.txt';
+      a.click();
+    });
+  </script>
+</body>
+</html>
