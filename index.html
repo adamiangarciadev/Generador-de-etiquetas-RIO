@@ -3,52 +3,118 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>GENERADOR DE ETIQUETAS</title>
+  <title>Generador de Etiquetas</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    select, button { width: 100%; padding: 10px; margin: 10px 0; }
-    ul { list-style-type: none; padding-left: 0; }
-    li { background: #eee; padding: 5px 10px; margin: 5px 0; border-radius: 5px; }
+    :root {
+      --primary: #2a7de1;
+      --light: #f9f9f9;
+      --gray: #ccc;
+      --border: #e0e0e0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--light);
+      padding: 40px 20px;
+    }
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+      color: #444;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      margin-top: 5px;
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      margin-top: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #1a5fb4;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 15px 0;
+    }
+    li {
+      background: #f0f0f0;
+      margin-bottom: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    @media (max-width: 600px) {
+      body { padding: 20px 10px; }
+      h1 { font-size: 18px; }
+    }
   </style>
 </head>
 <body>
-  
-<h1>Generador de TXT para ETIQUETAS</h1>
+  <div class="container">
+    <h1>Generador de Etiquetas</h1>
 
-<label for="sucursal">Sucursal que necesita las etiquetas:</label>
-<select id="sucursal">
-  <option value="AVELLANEDA 2">AVELLANEDA 2</option>
-  <option value="NAZCA">NAZCA</option>
-  <option value="LAMARCA">LAMARCA</option>
-  <option value="DEPOSITO">DEPOSITO</option>
-  <option value="CORRIENTES 2">CORRIENTES 2</option>
-  <option value="CORRIENTES 1">CORRIENTES 1</option>
-  <option value="MORENO">MORENO</option>
-  <option value="QUILMES">QUILMES</option>
-  <option value="WEB">WEB</option>
+    <label for="sucursal">Sucursal que necesita las etiquetas:</label>
+    <select id="sucursal">
+      <option value="AVELLANEDA 2">AVELLANEDA 2</option>
+      <option value="NAZCA">NAZCA</option>
+      <option value="LAMARCA">LAMARCA</option>
+      <option value="DEPOSITO">DEPOSITO</option>
+      <option value="CORRIENTES 2">CORRIENTES 2</option>
+      <option value="CORRIENTES 1">CORRIENTES 1</option>
+      <option value="MORENO">MORENO</option>
+      <option value="QUILMES">QUILMES</option>
+      <option value="WEB">WEB</option>
 </select>
 
+    </select>
 
-  
-<label for="busquedaArticulo">Buscar artículo:</label>
-<input type="text" id="busquedaArticulo" placeholder="Ej: 401 o 29-4" />
+    <label for="busquedaArticulo">Buscar artículo:</label>
+    <input type="text" id="busquedaArticulo" placeholder="Ej: 401 o 29-4" />
 
-<label for="articulo">Artículo:</label>
+    <label for="articulo">Artículo:</label>
+    <select id="articulo"><option value="">Cargando...</option></select>
 
-  <select id="articulo"><option value="">Cargando...</option></select>
+    <label for="color">Color:</label>
+    <select id="color" disabled><option value="">Seleccionar artículo</option></select>
 
-  <label for="color">Color:</label>
-  <select id="color" disabled><option value="">Seleccionar artículo</option></select>
+    <label for="talle">Talle:</label>
+    <select id="talle" disabled><option value="">Seleccionar color</option></select>
 
-  <label for="talle">Talle:</label>
-  <select id="talle" disabled><option value="">Seleccionar color</option></select>
+    <button id="agregar">Agregar a la lista</button>
 
-  <button id="agregar">Agregar a la lista</button>
+    <h3>Códigos agregados:</h3>
+    <ul id="lista"></ul>
 
-  <h3>Códigos agregados:</h3>
-  <ul id="lista"></ul>
-
-  <button id="descargar">Descargar TXT</button>
+    <button id="descargar">Descargar TXT</button>
+  </div>
 
   <script>
     let registros = [];
@@ -79,8 +145,6 @@
         });
       });
 
-    
-    // Filtrar artículos mientras se escribe
     document.getElementById('busquedaArticulo').addEventListener('input', function () {
       const filtro = this.value.toLowerCase();
       const artSelect = document.getElementById('articulo');
@@ -156,11 +220,9 @@
       const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      
-const sucursal = document.getElementById('sucursal').value || 'SIN_NOMBRE';
-const fecha = new Date().toISOString().split('T')[0];
-a.download = `ETIQUETAS_PARA_${sucursal.replace(/\s+/g, "_")}_${fecha}.txt`;
-
+      const sucursal = document.getElementById('sucursal').value || 'SIN_NOMBRE';
+      const fecha = new Date().toISOString().split('T')[0];
+      a.download = `codigos_${sucursal.replace(/\s+/g, "_")}_${fecha}.txt`;
       a.click();
     });
   </script>
