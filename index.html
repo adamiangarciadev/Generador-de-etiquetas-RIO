@@ -222,7 +222,7 @@
       a.href = URL.createObjectURL(blob);
       const sucursal = document.getElementById('sucursal').value || 'SIN_NOMBRE';
       const fecha = new Date().toISOString().split('T')[0];
-      a.download = `codigos_${sucursal.replace(/\s+/g, "_")}_${fecha}.txt`;
+      a.download = `ETIQUETAS_PARA_${sucursal.replace(/\s+/g, "_")}_${fecha}.txt`;
       a.click();
     });
   </script>
