@@ -12,9 +12,29 @@
   </style>
 </head>
 <body>
-  <h1>Generador de TXT desde equivalencias.csv</h1>
+  
+<h1>Generador de TXT desde equivalencias.csv</h1>
 
-  <label for="articulo">Artículo:</label>
+<label for="sucursal">Sucursal que necesita las etiquetas:</label>
+<select id="sucursal">
+  <option value="AVELLANEDA 2">AVELLANEDA 2</option>
+  <option value="NAZCA">NAZCA</option>
+  <option value="LAMARCA">lAMARCA</option>
+  <option value="DEPOSITO">DEPOSITO</option>
+  <option value="CORRIENTES 2">CORRIENTES 2</option>
+  <option value="CORRIENTES 1">CORRIENTES 1</option>
+  <option value="MORENO">MORENO</option>
+  <option value="QUILMES">QUILMES</option>
+  <option value="NAZCA">WEB</option>
+</select>
+
+
+  
+<label for="busquedaArticulo">Buscar artículo:</label>
+<input type="text" id="busquedaArticulo" placeholder="Ej: 401 o 29-4" />
+
+<label for="articulo">Artículo:</label>
+
   <select id="articulo"><option value="">Cargando...</option></select>
 
   <label for="color">Color:</label>
@@ -58,6 +78,29 @@
           artSelect.appendChild(opt);
         });
       });
+
+    
+    // Filtrar artículos mientras se escribe
+    document.getElementById('busquedaArticulo').addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      const artSelect = document.getElementById('articulo');
+      const articulosUnicos = [...new Set(registros.map(r => r.articulo))];
+
+      artSelect.innerHTML = '<option value="">Seleccionar...</option>';
+      articulosUnicos
+        .filter(art => art.toLowerCase().includes(filtro))
+        .forEach(art => {
+          const opt = document.createElement('option');
+          opt.value = art;
+          opt.textContent = art;
+          artSelect.appendChild(opt);
+        });
+
+      document.getElementById('color').innerHTML = '<option value="">Seleccionar artículo</option>';
+      document.getElementById('color').disabled = true;
+      document.getElementById('talle').innerHTML = '<option value="">Seleccionar color</option>';
+      document.getElementById('talle').disabled = true;
+    });
 
     document.getElementById('articulo').addEventListener('change', function() {
       const art = this.value;
@@ -113,7 +156,11 @@
       const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'ETIQUETAS NAZCA.txt';
+      
+const sucursal = document.getElementById('sucursal').value || 'SIN_NOMBRE';
+const fecha = new Date().toISOString().split('T')[0];
+a.download = `ETIQUETAS_PARA_${sucursal.replace(/\s+/g, "_")}_${fecha}.txt`;
+
       a.click();
     });
   </script>
