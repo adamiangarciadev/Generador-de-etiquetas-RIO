@@ -110,7 +110,7 @@
     const $ = (sel) => document.querySelector(sel);
 
     // ---------- Carga de equivalencias.csv ----------
-    fetch('equivalencias.csv')
+    fetch('equivalencias_.csv')
       .then(r => r.text())
       .then(text => {
         // Admite ; como separador. Ignora líneas vacías.
@@ -131,7 +131,7 @@
         });
       })
       .catch(() => {
-        $('#articulo').innerHTML = '<option value="">Error al cargar equivalencias.csv</option>';
+        $('#articulo').innerHTML = '<option value="">Error al cargar equivalencias_.csv</option>';
       });
 
     // ---------- Buscador de artículo ----------
